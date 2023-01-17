@@ -1,22 +1,37 @@
 
 # QRCode Extractor
 
-This is a DIY tool to deal with camera photos of exported accounts from Google Authenticator.
+## The Problem
 
-Google Authenticator uses a proprietary protobuf based export that is encoded inside the QRCode
-image, and there was no good tool or library that could read the actual data in the format that
-you can reuse it to import it into another 2FA authenticator app.
+One day, your smartphone is going to be remotely wiped all of a sudden. You are losing Apps by
+the second, you panic, and you get another Smartphone to take a quick camera photo of the Export
+Dialog of the Google Authenticator App to save your 2FA keys and tokens; because without them,
+you can access nothing.
 
-The general issue is that you need to take a photo with a camera, and the mobile apps usually
-don't allow to export the QRCode as a real image file, which means you are left with a crappy
-QRCode that no normal tool (outside the xzing world) can read.
+Then you realize that the Google Authenticator's Migration format, the `otp-migration://offline...`
+URL encoded inside the QR Code is actually incompatible with any other 2FA App.
+
+What do you do? You use this QR Code Extractor!
+
+
+## Features
+
+- Splits up Camera Photos of Google Authenticator 2FA Export QR Codes
+- Generates single QR Codes for (re-)import into another 2FA App
+- Decodes the Protobuf encoded parameters into a nice JSON, in case you 2FA App is as shitty as Microsoft Authenticator.
+
+## Libraries
+
+- This tool uses [goxzing](https://github.com/makiuchi-d/gozxing) to read and decode camera photos of QR code images.
+
 
 ## Usage
 
-This tool extracts a collection of `otp-migration://offline` encoded QRCodes into separate
-QRCode images and JSON files. You can either use the QRCode with a tool like KeePassXC, or
-you can inspect the JSON file, so that you can type in manually the base32 encoded `secret`
-and 2FA details such as the algorithm, type, digits, current period etc).
+This tool generates both a QR Code PNG image and a JSON file for reimport to `/tmp`.
+You can either use the QR code images (containing an `otpauth://<type>/<seed>?parameters...` URL)
+to scan them in with another 2FA App. Alternatively you can take a look at the JSON
+to manually type in the `base32` encoded secret; and to change the parameters like
+algorithm, type, digits or the current period, correctly.
 
 ```bash
 go run main.go ./path/to/camera-photo-of-migration-qrcode.jpg;
